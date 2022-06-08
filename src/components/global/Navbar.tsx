@@ -11,7 +11,7 @@ const Navbar = () => {
   return (
     <StyledNav>
       <h5>Who dis?</h5>
-      <div>Links</div>
+      {/* <div>Links</div> */}
     </StyledNav>
   );
 };
