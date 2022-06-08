@@ -10,7 +10,17 @@ interface Props {
   pageTitle: string;
 }
 
-const StyledContainer = styled.div``;
+const StyledContainer = styled.div({
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "100vh",
+  maxWidth: "1200px",
+  margin: "0 auto",
+});
+
+const StyledMain = styled.main({
+  flex: 1,
+});
 
 const Layout: Component<Props> = ({ children, pageTitle }) => {
   return (
@@ -19,7 +29,7 @@ const Layout: Component<Props> = ({ children, pageTitle }) => {
         <Title>{pageTitle} - Who dis?</Title>
       </>
       <Navbar />
-      <main>{children}</main>
+      <StyledMain>{children}</StyledMain>
       <Footer />
       <GlobalStyle />
     </StyledContainer>
