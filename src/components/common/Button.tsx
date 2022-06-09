@@ -1,6 +1,6 @@
 import { Link } from "@rturnq/solid-router";
 import classNames from "classnames";
-import { Component, JSX } from "solid-js";
+import { Component, JSX, mergeProps } from "solid-js";
 import { css } from "solid-styled-components";
 import theme from "../../styles/theme";
 
@@ -10,6 +10,7 @@ interface Props {
   href?: string;
   toNewTab?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
   variant?: "primary" | "secondary";
 }
 
@@ -40,35 +41,44 @@ const ButtonSecondaryClass = css({
   backgroundColor: theme.colors.background,
 });
 
-const Button: Component<Props> = ({
-  children,
-  to,
-  href,
-  toNewTab,
-  onClick,
-  variant = "secondary",
-}) => {
-  const classList = classNames(ButtonClass, {
-    [ButtonSecondaryClass]: variant === "secondary",
-  });
+const ButtonDisabledClass = css({
+  opacity: "0.5",
+  cursor: "default",
+  pointerEvents: "none",
+});
 
-  if (to)
+const Button: Component<Props> = (props) => {
+  const merged = mergeProps({ variant: "secondary", disabled: false }, props);
+  const classList = () =>
+    classNames(
+      ButtonClass,
+      {
+        [ButtonSecondaryClass]: merged.variant === "secondary",
+      },
+      { [ButtonDisabledClass]: merged.disabled }
+    );
+
+  if (props.to)
     return (
-      <Link class={classList} href={to}>
-        {children}
+      <Link class={classList()} href={props.to}>
+        {props.children}
       </Link>
     );
 
-  if (href)
+  if (props.href)
     return (
-      <a class={classList} href={href} target={toNewTab ? "_blank" : "_self"}>
-        {children}
+      <a
+        class={classList()}
+        href={props.href}
+        target={props.toNewTab ? "_blank" : "_self"}
+      >
+        {props.children}
       </a>
     );
 
   return (
-    <button class={classList} onClick={onClick}>
-      {children}
+    <button class={classList()} onClick={props.onClick}>
+      {props.children}
     </button>
   );
 };

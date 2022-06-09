@@ -1,25 +1,44 @@
 import { MatchRoute, pathIntegration, Router } from "@rturnq/solid-router";
-import { Component, Switch } from "solid-js";
-import { MetaProvider } from "solid-meta";
-import { ThemeProvider } from "solid-styled-components";
+import { Component, createEffect, Switch } from "solid-js";
+import PrivateRoute from "./components/routes/PrivateRoute";
+import PublicOnlyRoute from "./components/routes/PublicOnlyRoute";
+import { supabase } from "./helpers/supabase/supabaseClient";
+import { useSession } from "./providers/SessionProvider";
 import Home from "./routes/Home";
-import theme from "./styles/theme";
+import Login from "./routes/Login";
+import GlobalStyle from "./styles/GlobalStyle";
 
 // Hide at the end (password for postgres database): TU7dbGR4QL6qtRA5
 
 const App: Component = () => {
+  const [session, { setSession }] = useSession();
+
+  createEffect(() => {
+    setSession(supabase.auth.session());
+
+    supabase.auth.onAuthStateChange((_e, session) => {
+      setSession(session);
+    });
+  });
+
   return (
-    <MetaProvider>
-      <ThemeProvider theme={theme}>
-        <Router integration={pathIntegration()}>
-          <Switch fallback={() => "404"}>
-            <MatchRoute end>
+    <>
+      <Router integration={pathIntegration()}>
+        <Switch fallback={() => "404"}>
+          <MatchRoute end>
+            <PrivateRoute>
               <Home />
-            </MatchRoute>
-          </Switch>
-        </Router>
-      </ThemeProvider>
-    </MetaProvider>
+            </PrivateRoute>
+          </MatchRoute>
+          <MatchRoute path="login">
+            <PublicOnlyRoute>
+              <Login />
+            </PublicOnlyRoute>
+          </MatchRoute>
+        </Switch>
+      </Router>
+      <GlobalStyle />
+    </>
   );
 };
 

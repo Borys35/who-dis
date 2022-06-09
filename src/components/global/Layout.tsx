@@ -1,7 +1,6 @@
 import { Component, JSX } from "solid-js";
 import { Title } from "solid-meta";
 import { styled } from "solid-styled-components";
-import GlobalStyle from "../../styles/GlobalStyle";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 
@@ -31,7 +30,6 @@ const Layout: Component<Props> = ({ children, pageTitle }) => {
       <Navbar />
       <StyledMain>{children}</StyledMain>
       <Footer />
-      <GlobalStyle />
     </StyledContainer>
   );
 };

@@ -3,6 +3,9 @@ import { styled } from "solid-styled-components";
 
 interface Props {
   label: string;
+  type?: string;
+  value?: string;
+  onChange?: (e: any) => void;
 }
 
 const StyledContainer = styled.div({
@@ -14,6 +17,7 @@ const StyledLabel = styled.label(({ theme }) => ({
   left: "1rem",
   top: "0.5rem",
   transition: "0.2s ease-in-out",
+  pointerEvents: "none",
 }));
 const StyledInput = styled.input(({ theme }) => ({
   all: "unset",
@@ -29,10 +33,10 @@ const StyledInput = styled.input(({ theme }) => ({
   },
 }));
 
-const Input: Component<Props> = ({ label }) => {
+const Input: Component<Props> = ({ label, type = "text", value, onChange }) => {
   return (
     <StyledContainer>
-      <StyledInput required />
+      <StyledInput required type={type} value={value} onChange={onChange} />
       <StyledLabel>{label}</StyledLabel>
     </StyledContainer>
   );
