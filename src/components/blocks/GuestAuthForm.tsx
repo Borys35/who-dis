@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { v4 as uuidv4 } from "uuid";
 import { useSession } from "../../providers/SessionProvider";
 import Button from "../common/Button";
 import Form from "../common/Form";
@@ -11,7 +12,7 @@ const GuestAuthForm = () => {
   function handleSubmit(e: any) {
     e.preventDefault();
 
-    setSession({ name: name() });
+    setSession({ id: uuidv4(), name: name() });
   }
 
   return (

@@ -6,6 +6,7 @@ import { supabase } from "./helpers/supabase/supabaseClient";
 import { useSession } from "./providers/SessionProvider";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
+import Room from "./routes/Room";
 import GlobalStyle from "./styles/GlobalStyle";
 
 // Hide at the end (password for postgres database): TU7dbGR4QL6qtRA5
@@ -34,6 +35,13 @@ const App: Component = () => {
             <PublicOnlyRoute>
               <Login />
             </PublicOnlyRoute>
+          </MatchRoute>
+          <MatchRoute path="room/:id">
+            {(route) => (
+              <PrivateRoute>
+                <Room id={route.params.id} />
+              </PrivateRoute>
+            )}
           </MatchRoute>
         </Switch>
       </Router>

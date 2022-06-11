@@ -17,9 +17,11 @@
   "dependencies": {
     "@rturnq/solid-router": "^0.3.0",
     "@supabase/supabase-js": "^1.35.3",
+    "@types/uuid": "^8.3.4",
     "classnames": "^2.3.1",
     "solid-js": "^1.4.2",
     "solid-meta": "^0.27.5",
-    "solid-styled-components": "^0.28.1"
+    "solid-styled-components": "^0.28.1",
+    "uuid": "^8.3.2"
   }
 }

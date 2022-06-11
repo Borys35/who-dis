@@ -1,4 +1,5 @@
 import { css } from "solid-styled-components";
+import CreateRoomForm from "../components/blocks/CreateRoomForm";
 import Button from "../components/common/Button";
 import Form from "../components/common/Form";
 import Input from "../components/common/Input";
@@ -44,9 +45,7 @@ const Home = () => {
           >
             Or
           </Subtext>
-          <div>
-            <Button variant="primary">Create room</Button>
-          </div>
+          <CreateRoomForm />
         </div>
       </div>
     </Layout>

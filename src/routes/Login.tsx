@@ -1,8 +1,6 @@
 import { css } from "solid-styled-components";
 import AuthForm from "../components/blocks/AuthForm";
-import Button from "../components/common/Button";
-import Form from "../components/common/Form";
-import Input from "../components/common/Input";
+import GuestAuthForm from "../components/blocks/GuestAuthForm";
 import Subtext from "../components/common/Subtext";
 import Layout from "../components/global/Layout";
 
@@ -42,10 +40,7 @@ const Login = () => {
           >
             Or
           </Subtext>
-          <Form>
-            <Input label="Name" />
-            <Button variant="primary">Sign in as guest</Button>
-          </Form>
+          <GuestAuthForm />
         </div>
       </div>
     </Layout>

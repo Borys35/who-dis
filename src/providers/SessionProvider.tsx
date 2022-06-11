@@ -11,8 +11,19 @@ interface Props {
   children: JSX.Element;
 }
 
+export interface GuestSession {
+  id: string;
+  name: string;
+}
+
+export function isGuest(session: Session | GuestSession) {
+  return "id" in session;
+}
+
 const createSessionContext = () => {
-  const [session, setSession] = createSignal<Session | null>(null);
+  const [session, setSession] = createSignal<Session | GuestSession | null>(
+    null
+  );
 
   return [session, { setSession }] as const;
 };
