@@ -1,6 +1,6 @@
 import { useRouter } from "@rturnq/solid-router";
 import { Session } from "@supabase/supabase-js";
-import { Component, onMount } from "solid-js";
+import { Component, createSignal, For, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 import { css, styled } from "solid-styled-components";
 import OptionsList from "../components/blocks/OptionsList";
@@ -15,7 +15,7 @@ import {
   isGuest,
   useSession,
 } from "../providers/SessionProvider";
-import { RoomType } from "../typings";
+import { GameSetType, RoomType } from "../typings";
 
 interface Props {
   id: string;
@@ -30,6 +30,7 @@ const StyledList = styled.div({
 
 const Room: Component<Props> = (props) => {
   const [room, setRoom] = createStore<RoomType>({} as RoomType);
+  const [sets, setSets] = createSignal<Pick<GameSetType, "id" | "name">[]>([]);
   const [options, setOptions] = createStore({
     roundTime: 60,
     pointsToWin: 5,
@@ -49,15 +50,27 @@ const Room: Component<Props> = (props) => {
 
   onMount(async () => {
     try {
+      // Get room
       const { data, error } = await supabase
         .from<RoomType>("rooms")
         .select()
         .eq("id", props.id);
 
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error("Room not found");
 
       const roomData = data[0];
       setRoom(roomData);
+
+      // Get sets
+      const { data: setsData, error: setsError } = await supabase
+        .from<GameSetType>("sets")
+        .select("id, name");
+
+      if (setsError) throw setsError;
+      if (!setsData || setsData.length === 0) throw new Error("No sets found");
+
+      setSets(setsData);
     } catch (e: any) {
       alert(e.message);
       router.replace("/");
@@ -67,6 +80,14 @@ const Room: Component<Props> = (props) => {
   // onCleanup(() => {
   //   supabase.from<RoomType>("rooms").delete().match({ id: id() });
   // });
+
+  async function updateRoom(values: Partial<RoomType>) {
+    const { data, error } = await supabase
+      .from<RoomType>("rooms")
+      .update(values)
+      .match({ id: room.id });
+    console.log(data, error);
+  }
 
   return (
     <Layout pageTitle="Creating room">
@@ -110,10 +131,7 @@ const Room: Component<Props> = (props) => {
                   <Select
                     value={options.roundTime}
                     onChange={(e: any) =>
-                      setOptions(
-                        "roundTime",
-                        (roundTime) => (roundTime = e.target.value)
-                      )
+                      updateRoom({ round_time: e.target.value })
                     }
                   >
                     <option value={15}>15s</option>
@@ -128,12 +146,9 @@ const Room: Component<Props> = (props) => {
                 component: (
                   <Select
                     value={options.pointsToWin}
-                    onChange={(e: any) =>
-                      setOptions(
-                        "pointsToWin",
-                        (pointsToWin) => (pointsToWin = e.target.value)
-                      )
-                    }
+                    onChange={(e: any) => {
+                      updateRoom({ points_to_win: e.target.value });
+                    }}
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -150,10 +165,7 @@ const Room: Component<Props> = (props) => {
                   <Select
                     value={options.maxPlayers}
                     onChange={(e: any) =>
-                      setOptions(
-                        "maxPlayers",
-                        (maxPlayers) => (maxPlayers = e.target.value)
-                      )
+                      updateRoom({ max_players: e.target.value })
                     }
                   >
                     <option value={4}>4</option>
@@ -171,15 +183,12 @@ const Room: Component<Props> = (props) => {
                   <Select
                     value={options.roundTime}
                     onChange={(e: any) =>
-                      setOptions(
-                        "roundTime",
-                        (roundTime) => (roundTime = e.target.value)
-                      )
+                      updateRoom({ set_id: e.target.value })
                     }
                   >
-                    <option value={15}>15s</option>
-                    <option value={30}>30s</option>
-                    <option value={60}>60s</option>
+                    <For each={sets()}>
+                      {(set) => <option value={set.id}>{set.name}</option>}
+                    </For>
                   </Select>
                 ),
               },
