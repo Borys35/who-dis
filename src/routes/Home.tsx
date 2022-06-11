@@ -1,8 +1,6 @@
 import { css } from "solid-styled-components";
 import CreateRoomForm from "../components/blocks/CreateRoomForm";
-import Button from "../components/common/Button";
-import Form from "../components/common/Form";
-import Input from "../components/common/Input";
+import JoinRoomForm from "../components/blocks/JoinRoomForm";
 import Subtext from "../components/common/Subtext";
 import Layout from "../components/global/Layout";
 
@@ -35,10 +33,7 @@ const Home = () => {
             alignItems: "flex-start",
           })}
         >
-          <Form>
-            <Input label="Room ID" />
-            <Button variant="primary">Join room</Button>
-          </Form>
+          <JoinRoomForm />
           <Subtext
             class={css({ transform: "rotate(5deg)", alignSelf: "center" })}
             size="large"
