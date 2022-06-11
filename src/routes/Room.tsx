@@ -1,6 +1,13 @@
 import { useRouter } from "@rturnq/solid-router";
 import { Session } from "@supabase/supabase-js";
-import { Component, createSignal, For, onMount } from "solid-js";
+import {
+  Component,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { css, styled } from "solid-styled-components";
 import OptionsList from "../components/blocks/OptionsList";
@@ -50,6 +57,13 @@ const Room: Component<Props> = (props) => {
 
   onMount(async () => {
     try {
+      supabase
+        .from<RoomType>("rooms")
+        .on("UPDATE", (payload) => {
+          setRoom(payload.new);
+        })
+        .subscribe();
+
       // Get room
       const { data, error } = await supabase
         .from<RoomType>("rooms")
@@ -77,16 +91,17 @@ const Room: Component<Props> = (props) => {
     }
   });
 
-  // onCleanup(() => {
-  //   supabase.from<RoomType>("rooms").delete().match({ id: id() });
-  // });
+  onCleanup(() => {
+    supabase.removeAllSubscriptions();
+    // supabase.from<RoomType>("rooms").delete().match({ id: id() });
+  });
 
   async function updateRoom(values: Partial<RoomType>) {
-    const { data, error } = await supabase
+    // const { data, error } =
+    await supabase
       .from<RoomType>("rooms")
       .update(values)
       .match({ id: room.id });
-    console.log(data, error);
   }
 
   return (
@@ -119,89 +134,93 @@ const Room: Component<Props> = (props) => {
             ]}
           />
         </StyledList>
-        <StyledList>
-          <Subtext>Options</Subtext>
-          <OptionsList
-            isHost={userId() === room.host_id}
-            options={[
-              {
-                name: "Round time",
-                value: `${options.roundTime}s`,
-                component: (
-                  <Select
-                    value={options.roundTime}
-                    onChange={(e: any) =>
-                      updateRoom({ round_time: e.target.value })
-                    }
-                  >
-                    <option value={15}>15s</option>
-                    <option value={30}>30s</option>
-                    <option value={60}>60s</option>
-                  </Select>
-                ),
-              },
-              {
-                name: "Points to win",
-                value: options.pointsToWin.toString(),
-                component: (
-                  <Select
-                    value={options.pointsToWin}
-                    onChange={(e: any) => {
-                      updateRoom({ points_to_win: e.target.value });
-                    }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={15}>16</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
-                  </Select>
-                ),
-              },
-              {
-                name: "Max players",
-                value: options.maxPlayers.toString(),
-                component: (
-                  <Select
-                    value={options.maxPlayers}
-                    onChange={(e: any) =>
-                      updateRoom({ max_players: e.target.value })
-                    }
-                  >
-                    <option value={4}>4</option>
-                    <option value={6}>6</option>
-                    <option value={10}>10</option>
-                    <option value={24}>24</option>
-                    <option value={64}>64</option>
-                  </Select>
-                ),
-              },
-              {
-                name: "Game set",
-                value: options.gameSet.toString(),
-                component: (
-                  <Select
-                    value={options.roundTime}
-                    onChange={(e: any) =>
-                      updateRoom({ set_id: e.target.value })
-                    }
-                  >
-                    <For each={sets()}>
-                      {(set) => <option value={set.id}>{set.name}</option>}
-                    </For>
-                  </Select>
-                ),
-              },
-            ]}
-          />
-          <div
-            class={css({
-              marginTop: "2rem",
-            })}
-          >
-            <Button variant="primary">Start the game</Button>
-          </div>
-        </StyledList>
+        <Show when={room.id}>
+          <StyledList>
+            <Subtext>Options</Subtext>
+            <OptionsList
+              isHost={userId() === room.host_id}
+              options={[
+                {
+                  name: "Round time",
+                  value: `${room.round_time}s`,
+                  component: (
+                    <Select
+                      value={room.round_time}
+                      onChange={(e: any) =>
+                        updateRoom({ round_time: e.target.value })
+                      }
+                    >
+                      <option value={15}>15s</option>
+                      <option value={30}>30s</option>
+                      <option value={60}>60s</option>
+                    </Select>
+                  ),
+                },
+                {
+                  name: "Points to win",
+                  value: room.points_to_win.toString(),
+                  component: (
+                    <Select
+                      value={room.points_to_win}
+                      onChange={(e: any) => {
+                        updateRoom({ points_to_win: e.target.value });
+                      }}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={16}>16</option>
+                      <option value={20}>20</option>
+                      <option value={30}>30</option>
+                    </Select>
+                  ),
+                },
+                {
+                  name: "Max players",
+                  value: room.max_players.toString(),
+                  component: (
+                    <Select
+                      value={room.max_players}
+                      onChange={(e: any) =>
+                        updateRoom({ max_players: e.target.value })
+                      }
+                    >
+                      <option value={4}>4</option>
+                      <option value={6}>6</option>
+                      <option value={10}>10</option>
+                      <option value={24}>24</option>
+                      <option value={64}>64</option>
+                    </Select>
+                  ),
+                },
+                {
+                  name: "Game set",
+                  value: sets().find((set) => set.id === room.set_id)?.name,
+                  component: (
+                    <Select
+                      value={room.set_id}
+                      onChange={(e: any) =>
+                        updateRoom({ set_id: e.target.value })
+                      }
+                    >
+                      <For each={sets()}>
+                        {(set) => <option value={set.id}>{set.name}</option>}
+                      </For>
+                    </Select>
+                  ),
+                },
+              ]}
+            />
+            <div
+              class={css({
+                marginTop: "2rem",
+              })}
+            >
+              <Show when={userId() === room.host_id}>
+                <Button variant="primary">Start the game</Button>
+              </Show>
+            </div>
+          </StyledList>
+        </Show>
       </div>
     </Layout>
   );
