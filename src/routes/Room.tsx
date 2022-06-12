@@ -1,5 +1,4 @@
 import { useRouter } from "@rturnq/solid-router";
-import { Session } from "@supabase/supabase-js";
 import {
   Component,
   createSignal,
@@ -17,12 +16,8 @@ import Select from "../components/common/Select";
 import Subtext from "../components/common/Subtext";
 import Layout from "../components/global/Layout";
 import { supabase } from "../helpers/supabase/supabaseClient";
-import {
-  GuestSession,
-  isGuest,
-  useSession,
-} from "../providers/SessionProvider";
-import { GameSetType, RoomType } from "../typings";
+import { useUser } from "../providers/UserProvider";
+import { GameSetType, PlayerType, RoomType } from "../typings";
 
 interface Props {
   id: string;
@@ -38,25 +33,20 @@ const StyledList = styled.div({
 const Room: Component<Props> = (props) => {
   const [room, setRoom] = createStore<RoomType>({} as RoomType);
   const [sets, setSets] = createSignal<Pick<GameSetType, "id" | "name">[]>([]);
-  const [options, setOptions] = createStore({
-    roundTime: 60,
-    pointsToWin: 5,
-    maxPlayers: 4,
-    gameSet: false,
-  });
   const router = useRouter();
-  const [session] = useSession();
-  const userId = () => {
-    const sess = session();
-    if (sess === null) return;
+  const [user] = useUser();
+  // const userId = () => {
+  //   const sess = user;
+  //   if (sess === null) return;
 
-    if (isGuest(sess)) return (sess as GuestSession).id;
+  //   if (isGuest(sess)) return (sess as GuestSession).id;
 
-    return (sess as Session).user?.id;
-  };
+  //   return (sess as Session).user?.id;
+  // };
 
   onMount(async () => {
     try {
+      // Listen to room options changes
       supabase
         .from<RoomType>("rooms")
         .on("UPDATE", (payload) => {
@@ -74,7 +64,22 @@ const Room: Component<Props> = (props) => {
       if (!data || data.length === 0) throw new Error("Room not found");
 
       const roomData = data[0];
+      if (roomData.players.length >= roomData.max_players)
+        throw new Error("Too much players");
+
       setRoom(roomData);
+
+      const playerToAdd: PlayerType = {
+        id: user.profile?.id || "",
+        name: user.profile?.username || "",
+        points: 0,
+      };
+      await supabase
+        .from<RoomType>("rooms")
+        .update({
+          players: [...roomData.players, playerToAdd],
+        })
+        .match({ id: room.id });
 
       // Get sets
       const { data: setsData, error: setsError } = await supabase
@@ -125,20 +130,17 @@ const Room: Component<Props> = (props) => {
           gap: "6rem",
         })}
       >
-        <StyledList>
-          <Subtext>Players (2/{options.maxPlayers})</Subtext>
-          <PlayersList
-            players={[
-              { name: "Player 1", points: 2 },
-              { name: "Player 2", points: 12 },
-            ]}
-          />
-        </StyledList>
         <Show when={room.id}>
+          <StyledList>
+            <Subtext>
+              Players ({room.players.length}/{room.max_players})
+            </Subtext>
+            <PlayersList showPoints={false} players={room.players} />
+          </StyledList>
           <StyledList>
             <Subtext>Options</Subtext>
             <OptionsList
-              isHost={userId() === room.host_id}
+              isHost={user.profile?.id === room.host_id}
               options={[
                 {
                   name: "Round time",
@@ -215,7 +217,7 @@ const Room: Component<Props> = (props) => {
                 marginTop: "2rem",
               })}
             >
-              <Show when={userId() === room.host_id}>
+              <Show when={user.profile?.id === room.host_id}>
                 <Button variant="primary">Start the game</Button>
               </Show>
             </div>

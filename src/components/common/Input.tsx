@@ -25,6 +25,7 @@ const StyledInput = styled.input(({ theme }) => ({
   borderRadius: "2rem",
   backgroundColor: theme?.colors.white,
   padding: "0.5rem 1rem",
+  textAlign: "left",
 
   "&:focus + label, &:valid + label": {
     top: "-0.65rem",

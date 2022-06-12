@@ -11,8 +11,15 @@ export interface RoomType {
 }
 
 export interface PlayerType {
+  id: string;
   name: string;
   points: number;
+}
+
+export interface ProfileType {
+  id: string;
+  username: string;
+  email?: string;
 }
 
 export interface GameSetType {

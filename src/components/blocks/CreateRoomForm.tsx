@@ -1,12 +1,7 @@
 import { useRouter } from "@rturnq/solid-router";
-import { Session } from "@supabase/supabase-js";
 import { createSignal } from "solid-js";
 import { supabase } from "../../helpers/supabase/supabaseClient";
-import {
-  GuestSession,
-  isGuest,
-  useSession,
-} from "../../providers/SessionProvider";
+import { useUser } from "../../providers/UserProvider";
 import { RoomType } from "../../typings";
 import Button from "../common/Button";
 import Form from "../common/Form";
@@ -14,16 +9,13 @@ import Input from "../common/Input";
 
 const CreateRoomForm = () => {
   const [name, setName] = createSignal("");
-  const [session] = useSession();
+  const [user] = useUser();
   const router = useRouter();
 
   async function handleSubmit(e: any) {
     e.preventDefault();
 
     try {
-      const sess = session();
-      if (!sess) return;
-
       const values: Partial<RoomType> = {
         name: name(),
         max_players: 4,
@@ -31,9 +23,7 @@ const CreateRoomForm = () => {
         points_to_win: 10,
         players: [],
         set_id: "ea90cf8b-4a12-4331-8641-df92b594f4b4",
-        host_id: isGuest(sess)
-          ? (sess as GuestSession).id
-          : (sess as Session).user?.id,
+        host_id: user.profile?.id,
       };
 
       const { data, error } = await supabase

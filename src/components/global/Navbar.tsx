@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 import { css, styled } from "solid-styled-components";
 import { supabase } from "../../helpers/supabase/supabaseClient";
-import { useSession } from "../../providers/SessionProvider";
+import { useUser } from "../../providers/UserProvider";
 
 const StyledNav = styled.nav({
   padding: "1rem 0",
@@ -15,7 +15,7 @@ const LinkClass = css({
 });
 
 const Navbar = () => {
-  const [session] = useSession();
+  const [user] = useUser();
 
   function handleSignOut() {
     supabase.auth.signOut();
@@ -25,7 +25,7 @@ const Navbar = () => {
     <StyledNav>
       <h5>Who dis?</h5>
       <div>
-        <Show when={session()}>
+        <Show when={user.profile}>
           <span
             class={LinkClass}
             onClick={() => {

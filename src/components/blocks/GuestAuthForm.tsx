@@ -1,18 +1,18 @@
 import { createSignal } from "solid-js";
 import { v4 as uuidv4 } from "uuid";
-import { useSession } from "../../providers/SessionProvider";
+import { useUser } from "../../providers/UserProvider";
 import Button from "../common/Button";
 import Form from "../common/Form";
 import Input from "../common/Input";
 
 const GuestAuthForm = () => {
   const [name, setName] = createSignal("");
-  const [session, { setSession }] = useSession();
+  const [user, { setProfile }] = useUser();
 
   function handleSubmit(e: any) {
     e.preventDefault();
 
-    setSession({ id: uuidv4(), name: name() });
+    setProfile({ id: uuidv4(), username: name() });
   }
 
   return (
