@@ -11,7 +11,8 @@ const createUserContext = () => {
   const [user, setUser] = createStore<{
     session?: Session | null;
     profile?: ProfileType | null;
-  }>({});
+    loading: boolean;
+  }>({ loading: true });
 
   const setSession = (s?: Session | null) => {
     setUser("session", s);
@@ -19,8 +20,11 @@ const createUserContext = () => {
   const setProfile = (p?: ProfileType | null) => {
     setUser("profile", p);
   };
+  const setLoading = (l: boolean) => {
+    setUser("loading", l);
+  };
 
-  return [user, { setSession, setProfile }] as const;
+  return [user, { setSession, setProfile, setLoading }] as const;
 };
 type UserContextType = ReturnType<typeof createUserContext>;
 const UserContext = createContext<UserContextType>(createUserContext());

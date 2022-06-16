@@ -218,7 +218,12 @@ const Room: Component<Props> = (props) => {
               })}
             >
               <Show when={user.profile?.id === room.host_id}>
-                <Button variant="primary">Start the game</Button>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push("/game/hi")}
+                >
+                  Start the game
+                </Button>
               </Show>
             </div>
           </StyledList>

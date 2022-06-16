@@ -10,6 +10,7 @@ declare module "solid-styled-components" {
       black: string;
       grey: string;
       background: string;
+      message: string;
     };
     fontFamily: string;
     horizontalPadding: string;

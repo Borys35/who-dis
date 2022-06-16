@@ -24,7 +24,7 @@ const ButtonClass = css({
   fontFamily: theme.fontFamily,
   fontWeight: "bold",
   cursor: "pointer",
-  transition: "0.1s ease-in-out",
+  transition: "0.2s ease-in-out",
 
   "&:hover": {
     filter: "brightness(110%)",
