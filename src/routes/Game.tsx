@@ -1,3 +1,4 @@
+import { createSignal, Show } from "solid-js";
 import { css, styled } from "solid-styled-components";
 import PlayersList from "../components/blocks/PlayersList";
 import Button from "../components/common/Button";
@@ -6,6 +7,7 @@ import MessageGrid from "../components/game/MessageGrid";
 import Phone from "../components/game/Phone";
 import Reply from "../components/game/Reply";
 import Layout from "../components/global/Layout";
+import { useUser } from "../providers/UserProvider";
 
 const StyledContainer = styled.div({
   display: "grid",
@@ -21,6 +23,38 @@ const StyledSubtext = styled(Subtext)({
 });
 
 const Game = () => {
+  const [selectedMessage, setSelectedMessage] = createSignal<string | null>(
+    null
+  );
+  const [pickedMessage, setPickedMessage] = createSignal<string | null>(null);
+  const [user] = useUser();
+  const pickerId = "e4622b36-638a-458b-b0cf-2300175bbed3?";
+  const isPicker = () => user.profile?.id === pickerId;
+
+  // Submits selected message and sends it to database
+  async function handleSelectMessage(message: string) {
+    if (!selectedMessage || isPicker()) return;
+
+    setSelectedMessage(message);
+  }
+
+  // Submits selected message and sends it to database
+  async function handleSubmitMessage() {
+    if (!selectedMessage || isPicker()) return;
+  }
+
+  // Picks message from given replies
+  async function handlePickMessage(message: string) {
+    if (!isPicker()) return;
+
+    setPickedMessage(message);
+  }
+
+  // Submits picked message as a victorious reply
+  async function handleSubmitPickedMessage() {
+    if (!pickedMessage || !isPicker()) return;
+  }
+
   return (
     <Layout pageTitle="Game">
       <StyledContainer>
@@ -35,9 +69,27 @@ const Game = () => {
         <div>
           <StyledSubtext>Replies</StyledSubtext>
           <MessageGrid>
-            <Reply message="Hi" />
-            <Reply message="Hi" />
+            <Reply
+              message="Hi"
+              clickable={isPicker() && pickedMessage() !== "Hi"}
+              selected={pickedMessage() === "Hi"}
+              onClick={() => handlePickMessage("Hi")}
+            />
           </MessageGrid>
+          <Show when={isPicker()}>
+            <div
+              class={css({
+                marginTop: "1.5rem",
+              })}
+            >
+              <Button
+                disabled={!isPicker() || pickedMessage() === null}
+                onClick={handleSubmitPickedMessage}
+              >
+                Submit
+              </Button>
+            </div>
+          </Show>
         </div>
         <div>
           <StyledSubtext>Players</StyledSubtext>
@@ -59,14 +111,25 @@ const Game = () => {
               })}
             >
               <MessageGrid>
-                <Reply message="Hi" clickable={true} />
+                <Reply
+                  message="Hi"
+                  clickable={!isPicker() && selectedMessage() !== "Hi"}
+                  onClick={() => handleSelectMessage("Hi")}
+                  selected={selectedMessage() === "Hi"}
+                />
               </MessageGrid>
             </div>
-            <div>
-              <Button variant="secondary" disabled={true}>
-                Submit
-              </Button>
-            </div>
+            <Show when={!isPicker()}>
+              <div>
+                <Button
+                  variant="secondary"
+                  disabled={selectedMessage() === null}
+                  onClick={handleSubmitMessage}
+                >
+                  Submit
+                </Button>
+              </div>
+            </Show>
           </div>
         </div>
       </StyledContainer>
