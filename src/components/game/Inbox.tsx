@@ -9,7 +9,7 @@ interface Props {
 
 const StyledInbox = styled(Message)(({ theme }) => ({
   borderBottomLeftRadius: "0 !important",
-  backgroundColor: theme?.colors.background,
+  backgroundColor: theme?.colors.white,
   color: theme?.colors.black,
 }));
 

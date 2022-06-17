@@ -5,6 +5,8 @@ import PublicOnlyRoute from "./components/routes/PublicOnlyRoute";
 import { supabase } from "./helpers/supabase/supabaseClient";
 import { useUser } from "./providers/UserProvider";
 import Game from "./routes/Game";
+import GameSet from "./routes/GameSet";
+import GameSetSingle from "./routes/GameSetSingle";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
 import Room from "./routes/Room";
@@ -68,6 +70,18 @@ const App: Component = () => {
                   <Game />
                 </PrivateRoute>
               )}
+            </MatchRoute>
+            <MatchRoute path="game-set/:id">
+              {(route) => (
+                <PrivateRoute>
+                  <GameSetSingle id={route.params.id} />
+                </PrivateRoute>
+              )}
+            </MatchRoute>
+            <MatchRoute path="game-set">
+              <PrivateRoute>
+                <GameSet />
+              </PrivateRoute>
             </MatchRoute>
           </Switch>
         </Router>

@@ -33,6 +33,10 @@ const GlobalStyle = () => {
     h6: {
       fontSize: "1.5rem",
     },
+    a: {
+      color: "inherit",
+      textDecoration: "none",
+    },
   });
 
   return <Style />;

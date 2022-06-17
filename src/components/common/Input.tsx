@@ -34,11 +34,16 @@ const StyledInput = styled.input(({ theme }) => ({
   },
 }));
 
-const Input: Component<Props> = ({ label, type = "text", value, onChange }) => {
+const Input: Component<Props> = (props) => {
   return (
     <StyledContainer>
-      <StyledInput required type={type} value={value} onChange={onChange} />
-      <StyledLabel>{label}</StyledLabel>
+      <StyledInput
+        required
+        type={props.type}
+        value={props.value}
+        onChange={props.onChange}
+      />
+      <StyledLabel>{props.label}</StyledLabel>
     </StyledContainer>
   );
 };
