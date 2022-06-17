@@ -21,9 +21,12 @@ const AuthForm = () => {
     try {
       setProceeding(true);
 
-      const { error } = await supabase.auth.signIn({
-        email: email(),
-      });
+      const { error } = await supabase.auth.signIn(
+        {
+          email: email(),
+        },
+        { redirectTo: `${location.origin}/` }
+      );
       if (error) throw error;
 
       // Add username to profile in database if it doesn't exist
