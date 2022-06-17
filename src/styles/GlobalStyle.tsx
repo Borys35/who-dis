@@ -3,6 +3,9 @@ import { createGlobalStyles, useTheme } from "solid-styled-components";
 const GlobalStyle = () => {
   const theme = useTheme();
   const Style = createGlobalStyles({
+    html: {
+      fontSize: "14px",
+    },
     "*, *::before, *::after": {
       boxSizing: "border-box",
       margin: 0,
@@ -14,6 +17,7 @@ const GlobalStyle = () => {
       fontFamily: theme.fontFamily,
       margin: "0",
       padding: `0 ${theme.horizontalPadding}`,
+      overflowX: "hidden",
     },
     h1: {
       fontSize: "4rem",
@@ -36,6 +40,12 @@ const GlobalStyle = () => {
     a: {
       color: "inherit",
       textDecoration: "none",
+    },
+
+    [theme.mq.tablet]: {
+      html: {
+        fontSize: "16px",
+      },
     },
   });
 

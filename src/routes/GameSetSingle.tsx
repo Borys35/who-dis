@@ -25,17 +25,25 @@ interface Props {
 
 type MessageType = "inbox" | "reply";
 
-const StyledForms = styled.div({
+const StyledForms = styled.div(({ theme }) => ({
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "2rem",
-});
+  gridTemplateColumns: "1fr",
+  gap: "6rem 2rem",
 
-const StyledMessageGrid = styled(MessageGrid)({
-  marginTop: "3rem",
+  [theme!.mq.tablet]: {
+    gridTemplateColumns: "1fr 1fr",
+  },
+}));
+
+const StyledMessageGrid = styled(MessageGrid)(({ theme }) => ({
+  marginTop: "1.5rem",
   maxHeight: "400px",
   overflowY: "auto",
-});
+
+  [theme!.mq.tablet]: {
+    marginTop: "3rem",
+  },
+}));
 
 const GameSetSingle: Component<Props> = (props) => {
   const [gameSet, setGameSet] = createSignal<GameSetType | null>(null);
@@ -135,89 +143,95 @@ const GameSetSingle: Component<Props> = (props) => {
 
   return (
     <Layout pageTitle="Choose game set">
-      <Show when={gameSet()} fallback={() => <div>Loading</div>}>
-        <Modal open={!!toDelete()}>
-          <h5 class={css({ marginBottom: "1rem" })}>Want to delete?</h5>
-          <p class={css({ marginBottom: "2rem" })}>
-            Are you sure you want to delete "
-            {toDelete()!.type === "inbox"
-              ? gameSet()!.inboxes[toDelete()!.i]
-              : gameSet()!.replies[toDelete()!.i]}
-            " from {toDelete()!.type === "inbox" ? "Inboxes" : "Replies"}?
-          </p>
-          <div
+      <div
+        class={css({
+          margin: "4rem 0",
+        })}
+      >
+        <Show when={gameSet()} fallback={() => <div>Loading</div>}>
+          <Modal open={!!toDelete()}>
+            <h5 class={css({ marginBottom: "1rem" })}>Want to delete?</h5>
+            <p class={css({ marginBottom: "2rem" })}>
+              Are you sure you want to delete "
+              {toDelete()!.type === "inbox"
+                ? gameSet()!.inboxes[toDelete()!.i]
+                : gameSet()!.replies[toDelete()!.i]}
+              " from {toDelete()!.type === "inbox" ? "Inboxes" : "Replies"}?
+            </p>
+            <div
+              class={css({
+                display: "flex",
+                gap: "1rem",
+                justifyContent: "center",
+              })}
+            >
+              <Button onClick={handleCancelDeletingMessage}>Cancel</Button>
+              <Button variant="primary" onClick={handleDeleteMessage}>
+                Delete
+              </Button>
+            </div>
+          </Modal>
+          <h1
             class={css({
-              display: "flex",
-              gap: "1rem",
-              justifyContent: "center",
+              marginBottom: "2rem",
             })}
           >
-            <Button onClick={handleCancelDeletingMessage}>Cancel</Button>
-            <Button variant="primary" onClick={handleDeleteMessage}>
-              Delete
-            </Button>
-          </div>
-        </Modal>
-        <h1
-          class={css({
-            margin: "4rem 0 2rem 0",
-          })}
-        >
-          Game set
-        </h1>
-        <p
-          class={css({
-            marginBottom: "4rem",
-          })}
-        >
-          Chosen game set: <strong>{gameSet()!.name}</strong>
-        </p>
-        <StyledForms>
-          <div>
-            <Form onSubmit={handleAddInbox}>
-              <Input
-                label="Inbox"
-                value={inbox()}
-                onChange={(e) => setInbox(e.target.value)}
-              />
-              <Button variant="primary">Add inbox</Button>
-            </Form>
-            <StyledMessageGrid>
-              <For each={gameSet()!.inboxes}>
-                {(inbox, i) => (
-                  <Inbox
-                    message={inbox}
-                    clickable={true}
-                    onClick={() => handleStartDeletingMessage("inbox", i())}
-                  />
-                )}
-              </For>
-            </StyledMessageGrid>
-          </div>
-          <div>
-            <Form onSubmit={handleAddReply}>
-              <Input
-                label="Reply"
-                value={reply()}
-                onChange={(e) => setReply(e.target.value)}
-              />
-              <Button variant="primary">Add reply</Button>
-            </Form>
-            <StyledMessageGrid>
-              <For each={gameSet()!.replies}>
-                {(reply, i) => (
-                  <Reply
-                    message={reply}
-                    selected={true}
-                    clickable={true}
-                    onClick={() => handleStartDeletingMessage("reply", i())}
-                  />
-                )}
-              </For>
-            </StyledMessageGrid>
-          </div>
-        </StyledForms>
-      </Show>
+            Game set
+          </h1>
+          <p
+            class={css({
+              marginBottom: "4rem",
+            })}
+          >
+            Chosen game set: <strong>{gameSet()!.name}</strong>
+          </p>
+          <StyledForms>
+            <div>
+              <Form onSubmit={handleAddInbox}>
+                <Input
+                  label="Inbox"
+                  value={inbox()}
+                  onChange={(e) => setInbox(e.target.value)}
+                />
+                <Button variant="primary">Add inbox</Button>
+              </Form>
+              <StyledMessageGrid>
+                <For each={gameSet()!.inboxes}>
+                  {(inbox, i) => (
+                    <Inbox
+                      message={inbox}
+                      clickable={true}
+                      onClick={() => handleStartDeletingMessage("inbox", i())}
+                    />
+                  )}
+                </For>
+              </StyledMessageGrid>
+            </div>
+            <div>
+              <Form onSubmit={handleAddReply}>
+                <Input
+                  label="Reply"
+                  value={reply()}
+                  onChange={(e) => setReply(e.target.value)}
+                />
+                <Button variant="primary">Add reply</Button>
+              </Form>
+              <StyledMessageGrid>
+                <For each={gameSet()!.replies}>
+                  {(reply, i) => (
+                    <Reply
+                      message={reply}
+                      selected={true}
+                      clickable={true}
+                      onClick={() => handleStartDeletingMessage("reply", i())}
+                    />
+                  )}
+                </For>
+              </StyledMessageGrid>
+            </div>
+          </StyledForms>
+        </Show>
+      </div>
     </Layout>
   );
 };

@@ -1,5 +1,6 @@
 // import original module declarations
 import "solid-styled-components";
+import { BpType, MqType } from "./theme";
 
 // and extend them!
 declare module "solid-styled-components" {
@@ -14,5 +15,7 @@ declare module "solid-styled-components" {
     };
     fontFamily: string;
     horizontalPadding: string;
+    bp: BpType;
+    mq: MqType;
   }
 }

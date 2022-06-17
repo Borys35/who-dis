@@ -1,15 +1,17 @@
-import { css } from "solid-styled-components";
+import { css, useTheme } from "solid-styled-components";
 import CreateRoomForm from "../components/blocks/CreateRoomForm";
 import JoinRoomForm from "../components/blocks/JoinRoomForm";
 import Subtext from "../components/common/Subtext";
 import Layout from "../components/global/Layout";
 
 const Home = () => {
+  const theme = useTheme();
+
   return (
     <Layout pageTitle="Home">
       <div
         class={css({
-          marginTop: "4rem",
+          margin: "4rem 0",
         })}
       >
         <h1
@@ -29,13 +31,21 @@ const Home = () => {
         <div
           class={css({
             display: "flex",
-            gap: "3rem",
+            flexDirection: "column",
             alignItems: "flex-start",
+            gap: "3rem",
+
+            [theme.mq.tablet]: {
+              flexDirection: "row",
+            },
           })}
         >
           <JoinRoomForm />
           <Subtext
-            class={css({ transform: "rotate(5deg)", alignSelf: "center" })}
+            class={css({
+              transform: "rotate(5deg)",
+              [theme.mq.tablet]: { alignSelf: "center" },
+            })}
             size="large"
           >
             Or

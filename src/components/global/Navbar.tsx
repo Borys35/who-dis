@@ -4,22 +4,29 @@ import { css, styled } from "solid-styled-components";
 import { supabase } from "../../helpers/supabase/supabaseClient";
 import { useUser } from "../../providers/UserProvider";
 
-const StyledNav = styled.nav({
+const StyledNav = styled.nav(({ theme }) => ({
   padding: "1rem 0",
   display: "flex",
+  flexDirection: "column",
   justifyContent: "space-between",
-  alignItems: "center",
-});
+  gap: "0.5rem",
+
+  [theme!.mq.tablet]: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+}));
 
 const LinkClass = css({
   cursor: "pointer",
 });
 
 const Navbar = () => {
-  const [user] = useUser();
+  const [user, { setProfile }] = useUser();
 
   function handleSignOut() {
     supabase.auth.signOut();
+    setProfile(null);
   }
 
   return (

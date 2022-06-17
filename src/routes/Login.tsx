@@ -1,15 +1,17 @@
-import { css } from "solid-styled-components";
+import { css, useTheme } from "solid-styled-components";
 import AuthForm from "../components/blocks/AuthForm";
 import GuestAuthForm from "../components/blocks/GuestAuthForm";
 import Subtext from "../components/common/Subtext";
 import Layout from "../components/global/Layout";
 
 const Login = () => {
+  const theme = useTheme();
+
   return (
     <Layout pageTitle="Login">
       <div
         class={css({
-          marginTop: "4rem",
+          margin: "4rem 0",
         })}
       >
         <h1
@@ -29,13 +31,21 @@ const Login = () => {
         <div
           class={css({
             display: "flex",
+            flexDirection: "column",
             gap: "3rem",
             alignItems: "flex-start",
+
+            [theme.mq.tablet]: {
+              flexDirection: "row",
+            },
           })}
         >
           <AuthForm />
           <Subtext
-            class={css({ transform: "rotate(5deg)", alignSelf: "center" })}
+            class={css({
+              transform: "rotate(5deg)",
+              [theme.mq.tablet]: { alignSelf: "center" },
+            })}
             size="large"
           >
             Or

@@ -12,6 +12,8 @@ const StyledContainer = styled.div({
   display: "flex",
   flexDirection: "column",
   gap: "0.75rem",
+  maxHeight: "500px",
+  overflowY: "auto",
 });
 
 const PlayersList: Component<Props> = (props) => {

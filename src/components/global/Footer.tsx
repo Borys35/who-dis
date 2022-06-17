@@ -3,10 +3,16 @@ import { styled } from "solid-styled-components";
 const StyledFooter = styled.footer(({ theme }) => ({
   padding: "1rem 0",
   display: "flex",
+  flexDirection: "column",
   justifyContent: "space-between",
-  alignItems: "center",
+  gap: "0.5rem",
   fontSize: "0.9rem",
   color: theme?.colors.grey,
+
+  [theme!.mq.tablet]: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
 }));
 
 const StyledLinks = styled.div({
