@@ -67,7 +67,7 @@ const App: Component = () => {
             <MatchRoute path="game/:id">
               {(route) => (
                 <PrivateRoute>
-                  <Game />
+                  <Game id={route.params.id} />
                 </PrivateRoute>
               )}
             </MatchRoute>

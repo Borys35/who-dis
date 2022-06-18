@@ -17,7 +17,13 @@ import Subtext from "../components/common/Subtext";
 import Layout from "../components/global/Layout";
 import { supabase } from "../helpers/supabase/supabaseClient";
 import { useUser } from "../providers/UserProvider";
-import { GameSetType, PlayerType, RoomType } from "../typings";
+import {
+  GameSetType,
+  GameType,
+  PlayerHandType,
+  PlayerType,
+  RoomType,
+} from "../typings";
 
 interface Props {
   id: string;
@@ -74,6 +80,7 @@ const Room: Component<Props> = (props) => {
         id: user.profile?.id || "",
         name: user.profile?.username || "",
         points: 0,
+        replies: [],
       };
       await supabase
         .from<RoomType>("rooms")
@@ -91,6 +98,18 @@ const Room: Component<Props> = (props) => {
       if (!setsData || setsData.length === 0) throw new Error("No sets found");
 
       setSets(setsData);
+
+      // Listen to game creation
+      supabase
+        .from<GameType>("games")
+        .on("INSERT", (payload) => {
+          // If different game has been created, return.
+          if (payload.new.room_id !== room.id) return;
+
+          // Redirect to game
+          router.replace(`/game/${payload.new.id}`);
+        })
+        .subscribe();
     } catch (e: any) {
       alert(e.message);
       router.replace("/");
@@ -99,7 +118,6 @@ const Room: Component<Props> = (props) => {
 
   onCleanup(() => {
     supabase.removeAllSubscriptions();
-    // supabase.from<RoomType>("rooms").delete().match({ id: id() });
   });
 
   async function updateRoom(values: Partial<RoomType>) {
@@ -108,6 +126,61 @@ const Room: Component<Props> = (props) => {
       .from<RoomType>("rooms")
       .update(values)
       .match({ id: room.id });
+  }
+
+  async function handleCreateGame() {
+    function getRandomItems<T>(items: T[], count: number): T[] {
+      const result: T[] = [];
+      for (let i = 0; i < count; i++) {
+        const index = Math.floor(Math.random() * items.length);
+        const item = items[index];
+        items.splice(index, 1);
+        result.push(item);
+      }
+      return result;
+    }
+
+    try {
+      const { data: gameSetData, error: gameSetError } = await supabase
+        .from("rooms")
+        .select(
+          `
+        set:set_id(*)
+      `
+        )
+        .eq("id", room.id);
+
+      if (gameSetError) throw gameSetError;
+
+      const currentSet: GameSetType = { ...gameSetData[0].set };
+
+      const [current_inbox] = currentSet.inboxes.splice(
+        Math.floor(Math.random() * currentSet.inboxes.length),
+        1
+      );
+
+      const player_hands: PlayerHandType[] = [];
+      for (const player of room.players) {
+        player_hands.push({
+          id: player.id,
+          replies: getRandomItems(currentSet.replies, 5),
+        });
+      }
+
+      const { data, error } = await supabase.from<GameType>("games").insert({
+        picker_id: room.players[0].id,
+        room_id: room.id,
+        set_id: room.set_id,
+        remaining_inboxes: currentSet.inboxes,
+        remaining_replies: currentSet.replies,
+        player_hands,
+        current_inbox,
+      });
+
+      if (error) throw error;
+    } catch (e: any) {
+      alert(e.message);
+    }
   }
 
   return (
@@ -224,10 +297,7 @@ const Room: Component<Props> = (props) => {
                 })}
               >
                 <Show when={user.profile?.id === room.host_id}>
-                  <Button
-                    variant="primary"
-                    onClick={() => router.push("/game/hi")}
-                  >
+                  <Button variant="primary" onClick={() => handleCreateGame()}>
                     Start the game
                   </Button>
                 </Show>
